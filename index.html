@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpecTa Education - AI Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 1rem 2rem;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            height: 35px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo img {
+            height: 100%;
+            width: auto;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 0.5rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-menu li {
+            position: relative;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #4a5568;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.6rem 1rem;
+            border-radius: 10px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            display: block;
+            overflow: hidden;
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #EF4444 0%, #3B82F6 100%);
+            border-radius: 3px 3px 0 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(-50%);
+        }
+
+        .nav-menu a:hover {
+            color: #EF4444;
+            background: rgba(239, 68, 68, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .nav-menu a:hover::after {
+            width: 60%;
+            background: linear-gradient(90deg, #EF4444 0%, #3B82F6 100%);
+        }
+
+        .nav-menu a.active {
+            color: #EF4444;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%);
+            font-weight: 600;
+        }
+
+        .nav-menu a.active::after {
+            width: 70%;
+            background: linear-gradient(90deg, #EF4444 0%, #3B82F6 100%);
+        }
+
+        .nav-menu a:active {
+            transform: translateY(0);
+        }
+
+        /* Video Background */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            object-fit: cover;
+            object-position: center;
+            pointer-events: none;
+        }
+
+        /* Main Content */
+        main {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6rem 2rem 2rem;
+        }
+
+        /* Robot Video Area */
+        .robot-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 400px;
+        }
+
+        /* Chat Container */
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 2rem;
+        }
+
+        .chat-input-container {
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-end;
+            background: #f5f5f5;
+            border-radius: 16px;
+            padding: 0.75rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 0.95rem;
+            color: #1a1a1a;
+            resize: none;
+            outline: none;
+            max-height: 120px;
+            font-family: inherit;
+        }
+
+        .chat-input::placeholder {
+            color: #999;
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            color: #666;
+        }
+
+        .btn-icon:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-icon.recording {
+            background: #ff4444;
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .btn-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .btn-send {
+            background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+            color: white;
+        }
+
+        .btn-send:hover {
+            opacity: 0.9;
+        }
+
+        .btn-send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+            }
+
+            .nav-menu {
+                gap: 1rem;
+                font-size: 0.85rem;
+            }
+
+            .nav-menu li:nth-child(n+4) {
+                display: none;
+            }
+
+            .chat-container {
+                border-radius: 16px;
+            }
+
+            .robot-area {
+                min-height: 200px;
+            }
+
+            main {
+                padding: 5rem 1rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Video Background -->
+    <video id="helloVideo" class="video-background" autoplay>
+        <source src="hello.mp4" type="video/mp4">
+    </video>
+    <video id="idleVideo" class="video-background" loop style="display: none;">
+        <source src="idle.mp4" type="video/mp4">
+    </video>
+
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="logo.jpg" alt="SpecTa Education">
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#tentang-kami">Tentang Kami</a></li>
+                <li><a href="#ielts">IELTS</a></li>
+                <li><a href="#pendidikan-luar-negeri">Pendidikan Luar Negeri</a></li>
+                <li><a href="#artikel">Artikel</a></li>
+                <li><a href="#hubungi-kami">Hubungi Kami</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="robot-area">
+            <!-- Video robot akan terlihat di background -->
+        </div>
+        <div class="chat-container" style="transform: translateY(30px);">
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <textarea style="transform: translateY(-10px);"
+                        id="chatInput" 
+                        class="chat-input" 
+                        placeholder="Tanya apapun tentang SpecTa Education atau tekan tombol mikrofon untuk berbicara..."
+                        rows="1"
+                    ></textarea>
+                    <div class="input-actions">
+                        <button id="recordBtn" class="btn-icon" title="Record Audio">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+                            </svg>
+                        </button>
+                        <button id="sendBtn" class="btn-icon btn-send" title="Send Message">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Video Background Logic
+        const helloVideo = document.getElementById('helloVideo');
+        const idleVideo = document.getElementById('idleVideo');
+
+        // Handle video play with sound
+        helloVideo.addEventListener('loadedmetadata', () => {
+            helloVideo.play().catch(error => {
+                console.log('Autoplay dengan suara diblokir, mencoba tanpa suara...');
+                helloVideo.muted = true;
+                helloVideo.play();
+            });
+        });
+
+        helloVideo.addEventListener('ended', () => {
+            helloVideo.style.display = 'none';
+            idleVideo.style.display = 'block';
+            idleVideo.muted = helloVideo.muted; // Sync mute state
+            idleVideo.play().catch(error => {
+                console.log('Autoplay idle video diblokir');
+            });
+        });
+
+        // Menu Active State
+        const navLinks = document.querySelectorAll('.nav-menu a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Chat Functionality
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const recordBtn = document.getElementById('recordBtn');
+
+        let recognition = null;
+        let isRecording = false;
+
+        // Initialize Speech Recognition
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'id-ID';
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                chatInput.value = transcript;
+                adjustTextareaHeight();
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                stopRecording();
+            };
+
+            recognition.onend = () => {
+                stopRecording();
+            };
+        }
+
+        function startRecording() {
+            if (!recognition) {
+                alert('Speech recognition tidak didukung di browser Anda');
+                return;
+            }
+
+            try {
+                recognition.start();
+                isRecording = true;
+                recordBtn.classList.add('recording');
+                recordBtn.title = 'Menghentikan rekaman...';
+            } catch (error) {
+                console.error('Error starting recognition:', error);
+            }
+        }
+
+        function stopRecording() {
+            if (recognition && isRecording) {
+                recognition.stop();
+            }
+            isRecording = false;
+            recordBtn.classList.remove('recording');
+            recordBtn.title = 'Record Audio';
+        }
+
+        recordBtn.addEventListener('click', () => {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        });
+
+        // Auto-resize textarea
+        function adjustTextareaHeight() {
+            chatInput.style.height = 'auto';
+            chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+        }
+
+        chatInput.addEventListener('input', adjustTextareaHeight);
+
+        // Send message
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            // TODO: Implementasi API call untuk mengirim pesan
+            console.log('Pesan dikirim:', message);
+            chatInput.value = '';
+            adjustTextareaHeight();
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Disable video controls
+        helloVideo.controls = false;
+        idleVideo.controls = false;
+        helloVideo.disablePictureInPicture = true;
+        idleVideo.disablePictureInPicture = true;
+    </script>
+</body>
+</html>
